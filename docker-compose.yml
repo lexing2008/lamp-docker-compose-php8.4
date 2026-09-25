@@ -1,0 +1,48 @@
+services:
+  apachephp:
+    build:
+      context: ./docker/apachephp
+    ports:
+      - 80:80
+      - 443:443
+    extra_hosts:
+      - "furniture.local:127.0.0.1"
+    volumes:
+      - './www:/var/www/html'
+
+  db:
+    image: mariadb:10.3.11
+    restart: on-failure
+    volumes:
+      - './volumes/mariadb:/var/lib/mysql'
+    ports:
+      - 3306:3306
+    environment:
+      TZ: "Europe/Minsk"
+      MYSQL_ROOT_PASSWORD: pass
+      MYSQL_USER: dbuser
+      MYSQL_PASSWORD: test123
+      # MYSQL_DATABASE: testdb
+
+  mongodb:
+    image: mongo
+    restart: on-failure
+    volumes:
+      - './volumes/mongodb:/data/db'
+    ports:
+      - 27017:27017
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    mem_reservation: 256m
+
+  memcache:
+    image: memcached:alpine
+    ports:
+      - 11211:11211
+
+  #redis:
+  #  image: redis:alpine
+  #  ports:
+  #    - 6379:6379
